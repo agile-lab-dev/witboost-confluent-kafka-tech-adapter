@@ -1,6 +1,6 @@
 from datetime import datetime
 from enum import StrEnum
-from typing import Annotated, List, Literal, Optional, Type
+from typing import Annotated, Any, List, Literal, Optional, Type
 
 from pydantic import (
     AnyUrl,
@@ -117,7 +117,7 @@ class Component(BaseModel):
     name: str
     fullyQualifiedName: Optional[str] = None
     description: str
-    specific: dict
+    specific: Any
 
 
 class OutputPort(Component):
@@ -135,8 +135,8 @@ class OutputPort(Component):
     startDate: Optional[datetime] = None
     retentionTime: Optional[str] = None
     processDescription: Optional[str] = None
-    dataContract: DataContract
-    dataSharingAgreement: DataSharingAgreement
+    dataContract: Optional[DataContract] = None
+    dataSharingAgreement: Optional[DataSharingAgreement] = None
     tags: List[OpenMetadataTagLabel]
     sampleData: Optional[dict] = None  # OpenMetadataTable
     semanticLinking: List[dict]

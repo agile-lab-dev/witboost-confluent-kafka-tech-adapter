@@ -26,7 +26,9 @@ def test_provisioning_invalid_descriptor():
 
 
 def test_provisioning_valid_descriptor():
-    descriptor_str = Path("tests/descriptors/descriptor_output_port_valid.yaml").read_text()
+    descriptor_str = Path(
+        "tests/descriptors/descriptor_output_port_valid.yaml"
+    ).read_text()
 
     provisioning_request = ProvisioningRequest(
         descriptorKind=DescriptorKind.COMPONENT_DESCRIPTOR, descriptor=descriptor_str
@@ -50,7 +52,9 @@ def test_unprovisioning_invalid_descriptor():
 
 
 def test_unprovisioning_valid_descriptor():
-    descriptor_str = Path("tests/descriptors/descriptor_output_port_valid.yaml").read_text()
+    descriptor_str = Path(
+        "tests/descriptors/descriptor_output_port_valid.yaml"
+    ).read_text()
 
     unprovisioning_request = ProvisioningRequest(
         descriptorKind=DescriptorKind.COMPONENT_DESCRIPTOR, descriptor=descriptor_str
@@ -74,7 +78,7 @@ def test_validate_invalid_descriptor():
 
 
 def test_validate_valid_descriptor():
-    descriptor_str = Path("tests/descriptors/descriptor_output_port_valid.yaml").read_text()
+    descriptor_str = Path("tests/descriptors/descriptor_valid.yaml").read_text()
 
     validate_request = ProvisioningRequest(
         descriptorKind=DescriptorKind.COMPONENT_DESCRIPTOR, descriptor=descriptor_str
@@ -82,8 +86,8 @@ def test_validate_valid_descriptor():
 
     resp = client.post("/v1/validate", json=dict(validate_request))
 
-    assert resp.status_code == 500
-    assert "Response not yet implemented" in resp.json().get("error")
+    assert resp.status_code == 200
+    assert {"error": None, "valid": True} == resp.json()
 
 
 def test_updateacl_invalid_descriptor():
@@ -99,7 +103,9 @@ def test_updateacl_invalid_descriptor():
 
 
 def test_updateacl_valid_descriptor():
-    descriptor_str = Path("tests/descriptors/descriptor_output_port_valid.yaml").read_text()
+    descriptor_str = Path(
+        "tests/descriptors/descriptor_output_port_valid.yaml"
+    ).read_text()
 
     updateacl_request = UpdateAclRequest(
         provisionInfo=ProvisionInfo(request=descriptor_str, result=""),

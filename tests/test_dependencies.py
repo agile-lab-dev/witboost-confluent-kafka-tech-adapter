@@ -21,7 +21,9 @@ from src.models.data_product_descriptor import DataProduct
 
 
 class TestUnpackUpdateAclRequest(unittest.TestCase):
-    descriptor_str = Path("tests/descriptors/descriptor_output_port_valid.yaml").read_text()
+    descriptor_str = Path(
+        "tests/descriptors/descriptor_output_port_valid.yaml"
+    ).read_text()
     update_acl_request = UpdateAclRequest(
         refs=["user:testuser", "bigData"],
         provisionInfo=ProvisionInfo(
@@ -57,7 +59,9 @@ class TestUnpackUpdateAclRequest(unittest.TestCase):
 
 
 class TestUnpackProvisioningRequest(unittest.TestCase):
-    descriptor_str = Path("tests/descriptors/descriptor_output_port_valid.yaml").read_text()
+    descriptor_str = Path(
+        "tests/descriptors/descriptor_output_port_valid.yaml"
+    ).read_text()
     provisioning_request = ProvisioningRequest(
         descriptorKind="COMPONENT_DESCRIPTOR",
         descriptor=descriptor_str,  # noqa: E501
@@ -126,7 +130,9 @@ client = TestClient(app_test)
 
 class TestAppDependenciesMock(unittest.TestCase):
     def test_provision_valid_request(self):
-        descriptor_str = Path("tests/descriptors/descriptor_output_port_valid.yaml").read_text()
+        descriptor_str = Path(
+            "tests/descriptors/descriptor_output_port_valid.yaml"
+        ).read_text()
         valid_provisioning_request = ProvisioningRequest(
             descriptorKind="COMPONENT_DESCRIPTOR",
             descriptor=descriptor_str,  # noqa: E501
@@ -155,7 +161,9 @@ class TestAppDependenciesMock(unittest.TestCase):
         assert "errors" in response.json()
 
     def test_updateacl_valid_request(self):
-        descriptor_str = Path("tests/descriptors/descriptor_output_port_valid.yaml").read_text()
+        descriptor_str = Path(
+            "tests/descriptors/descriptor_output_port_valid.yaml"
+        ).read_text()
         valid_update_acl_request = UpdateAclRequest(
             refs=["user:testuser", "bigData"],
             provisionInfo=ProvisionInfo(

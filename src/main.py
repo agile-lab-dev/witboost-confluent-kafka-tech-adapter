@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+import uuid
+
+from fastapi import Request
+from starlette.background import BackgroundTask
 from starlette.responses import Response
 
 from src.app_config import app
@@ -17,9 +21,34 @@ from src.models.api_models import (
     ValidationResult,
     ValidationStatus,
 )
+from src.services.validation_service import ValidateKafkaOutputPortDep
 from src.utility.logger import get_logger
 
 logger = get_logger()
+
+
+def log_info(req_body, res_body):
+    id = str(uuid.uuid4())
+    logger.info("[%s] REQUEST: %s", id, req_body.decode("utf-8"))
+    logger.info("[%s] RESPONSE: %s", id, res_body.decode("utf-8"))
+
+
+@app.middleware("http")
+async def log_request_response_middleware(request: Request, call_next):
+    req_body = await request.body()
+    response = await call_next(request)
+    chunks = []
+    async for chunk in response.body_iterator:
+        chunks.append(chunk)
+    res_body = b"".join(chunks)
+    task = BackgroundTask(log_info, req_body, res_body)
+    return Response(
+        content=res_body,
+        status_code=response.status_code,
+        headers=dict(response.headers),
+        media_type=response.media_type,
+        background=task,
+    )
 
 
 @app.post(
@@ -147,7 +176,7 @@ def updateacl(request: UnpackedUpdateAclRequestDep) -> Response:
     responses={"200": {"model": ValidationResult}, "500": {"model": SystemErr}},
     tags=["SpecificProvisioner"],
 )
-def validate(request: UnpackedProvisioningRequestDep) -> Response:
+def validate(request: ValidateKafkaOutputPortDep) -> Response:
     """
     Validate a provisioning request
     """
@@ -155,16 +184,7 @@ def validate(request: UnpackedProvisioningRequestDep) -> Response:
     if isinstance(request, ValidationError):
         return check_response(ValidationResult(valid=False, error=request))
 
-    data_product, component_id = request
-
-    # todo: define correct response. You can define your pydantic component type with the expected specific schema
-    #  and use `.get_type_component_by_id` to extract it from the data product
-
-    # componentToProvision = data_product.get_typed_component_by_id(component_id, MyTypedComponent)
-
-    resp = SystemErr(error="Response not yet implemented")
-
-    return check_response(out_response=resp)
+    return check_response(out_response=ValidationResult(valid=True))
 
 
 @app.post(
