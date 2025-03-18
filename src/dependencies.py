@@ -1,3 +1,4 @@
+from functools import lru_cache
 from typing import Annotated, Tuple
 
 import yaml
@@ -10,6 +11,15 @@ from src.models.api_models import (
     ValidationError,
 )
 from src.models.data_product_descriptor import DataProduct
+from src.services.acl_service import AclService
+from src.services.kafka_client_service import KafkaClientService
+from src.services.principal_mapping_service import PrincipalMappingService
+from src.services.provision_service import ProvisionService
+from src.services.sasl_plain_principal_mapping_service import (
+    SaslPlainPrincipalMappingService,
+)
+from src.services.schema_registry_service import SchemaRegistryService
+from src.settings.kafka_settings import KafkaSettings
 from src.utility.logger import get_logger
 from src.utility.parsing_pydantic_models import parse_yaml_with_model
 
@@ -177,3 +187,53 @@ UnpackedUpdateAclRequestDep = Annotated[
     Tuple[DataProduct, str, list[str]] | ValidationError,
     Depends(unpack_update_acl_request),
 ]
+
+
+@lru_cache
+def get_kafka_settings() -> KafkaSettings:
+    return KafkaSettings()
+
+
+def get_kafka_client_service(
+    kafka_settings: Annotated[KafkaSettings, Depends(get_kafka_settings)]
+) -> KafkaClientService:
+    return KafkaClientService(kafka_settings)
+
+
+def get_principal_mapping_service() -> PrincipalMappingService:
+    return SaslPlainPrincipalMappingService()
+
+
+def get_schema_registry_service(
+    kafka_settings: Annotated[KafkaSettings, Depends(get_kafka_settings)]
+) -> SchemaRegistryService:
+    return SchemaRegistryService(kafka_settings)
+
+
+def get_acl_service(
+    kafka_settings: Annotated[KafkaSettings, Depends(get_kafka_settings)]
+) -> AclService:
+    return AclService(kafka_settings)
+
+
+def get_provision_service(
+    kafka_client_service: Annotated[
+        KafkaClientService, Depends(get_kafka_client_service)
+    ],
+    principal_mapping_service: Annotated[
+        PrincipalMappingService, Depends(get_principal_mapping_service)
+    ],
+    schema_registry_service: Annotated[
+        SchemaRegistryService, Depends(get_schema_registry_service)
+    ],
+    acl_service: Annotated[AclService, Depends(get_acl_service)],
+) -> ProvisionService:
+    return ProvisionService(
+        kafka_client_service,
+        principal_mapping_service,
+        schema_registry_service,
+        acl_service,
+    )
+
+
+ProvisionServiceDep = Annotated[ProvisionService, Depends(get_provision_service)]

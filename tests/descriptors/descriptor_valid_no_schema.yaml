@@ -1,0 +1,79 @@
+dataProduct:
+  id: urn:dmb:dp:healthcare:vaccinations:0
+  name: Vaccinations
+  fullyQualifiedName: Vaccinations
+  description: DP about vaccinations
+  kind: dataproduct
+  domain: healthcare
+  version: 0.1.0
+  environment: development
+  dataProductOwner: user:name.surname_agilelab.it
+  dataProductOwnerDisplayName: Name Surname
+  email: name.surname@email.com
+  ownerGroup: name.surname_email.com
+  devGroup: group:dev
+  informationSLA: 2BD
+  maturity: Tactical
+  billing: { }
+  tags: [ ]
+  specific: { }
+  domainId: urn:dmb:dmn:healthcare
+  useCaseTemplateId: urn:dmb:utm:dataproduct-template:0.0.0
+  infrastructureTemplateId: urn:dmb:itm:dataproduct-provisioner:1
+  components:
+    - kind: outputport
+      id: urn:dmb:cmp:healthcare:vaccinations:0:kafka-output-port
+      description: Kafka OP for the Vaccinations use case
+      name: Kafka Output Port
+      fullyQualifiedName: Kafka Output Port
+      version: 0.0.0
+      infrastructureTemplateId: urn:dmb:itm:confluent-kafka-tech-adapter:0
+      useCaseTemplateId: urn:dmb:utm:confluent-kafka-outputport-template:0.0.0
+      dependsOn: []
+      platform: Confluent
+      technology: Kafka
+      outputPortType: Events
+      dataContract:
+        schema: []
+        SLA:
+          intervalOfChange: 2BD
+          timeliness: 2BD
+          upTime: 99.9%
+        termsAndConditions: Can be used for production purposes test.
+      tags: []
+      sampleData: {}
+      semanticLinking: []
+      specific:
+        topic:
+          name: healthcare_vaccinations_0_kafka-output-port_development
+          numPartitions: 3
+          replicationFactor: 1
+          config:
+            "max.message.bytes": 2097176
+          valueSchema: null
+        ownerPermissions:
+          - resourceType: TOPIC
+            resourceName: healthcare_vaccinations_0_kafka-output-port_development
+            resourcePatternType: LITERAL
+            operation: READ
+            permissionType: ALLOW
+          - resourceType: TOPIC
+            resourceName: healthcare_vaccinations_0_kafka-output-port_development
+            resourcePatternType: LITERAL
+            operation: WRITE
+            permissionType: ALLOW
+          - resourceType: GROUP
+            resourceName: healthcare_vaccinations_0_kafka-output-port_development_owner_consumer_group
+            resourcePatternType: LITERAL
+            operation: READ
+            permissionType: ALLOW
+      dataSharingAgreement:
+        purpose: Foundational data for downstream use cases.
+        billing: None.
+        security: Platform standard security policies.
+        intendedUsage: Any downstream use cases.
+        limitations: Needs joining with other datasets (eg customer data) for most
+          analytical use cases.
+        lifeCycle: Data loaded every two days and typically never deleted.
+        confidentiality: None.
+componentIdToProvision: urn:dmb:cmp:healthcare:vaccinations:0:kafka-output-port

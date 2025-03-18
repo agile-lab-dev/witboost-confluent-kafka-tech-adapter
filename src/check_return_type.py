@@ -3,6 +3,7 @@ import json
 from typing import Any
 
 from fastapi import FastAPI
+from fastapi.encoders import jsonable_encoder
 from fastapi.routing import APIRoute
 from pydantic import BaseModel
 from starlette.responses import Response
@@ -127,7 +128,7 @@ def _check_response_type(responses: dict, out_response: Any) -> Response:
         )
 
     if isinstance(out_response, BaseModel):
-        content = json.dumps(out_response.model_dump())
+        content = json.dumps(jsonable_encoder(out_response))
         media_type = "application/json"
     elif isinstance(out_response, list) and all(
         isinstance(item, BaseModel) for item in out_response

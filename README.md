@@ -21,7 +21,8 @@ This repository is part of our [Starter Kit](https://github.com/agile-lab-dev/wi
 
 ## Overview
 
-TODO
+This project implements a Tech Adapter for Confluent Kafka. After deploying this microservice and configuring Witboost to use it, the platform can deploy components of a System that use Kafka. Supported components are: Output Ports.
+Refer to the [Witboost Starter Kit repository](https://github.com/agile-lab-dev/witboost-starter-kit) for information on the templates that can be used with this Tech Adapter.
 
 ### What's a Specific Provisioner?
 
@@ -116,7 +117,12 @@ _Note:_ the version for the project is automatically computed using information 
 
 ## Configuring
 
-TODO
+Application configurations are handled with environment variables:
+
+| Environment Variable                  | Description                                           | Example                                  |
+|---------------------------------------|-------------------------------------------------------|------------------------------------------|
+| KAFKA_ADMIN_CLIENT_CONFIG             | Dictionary containing admin client config             | `{"bootstrap.servers":"localhost:9092"}` |
+| KAFKA_SCHEMA_REGISTRY_CLIENT_CONFIG   | Dictionary containing schema registry client config   | `{"url":"http://localhost:8081"}`        |
 
 ## Running
 

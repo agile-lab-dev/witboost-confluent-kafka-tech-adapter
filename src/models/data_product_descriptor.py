@@ -25,19 +25,29 @@ class ComponentKind(StrEnum):
     OBSERVABILITY = "observability"
 
 
-class TagSourceTagLabel(StrEnum):
+class CaseInsensitiveEnum(StrEnum):
+    @classmethod
+    def _missing_(cls, value):
+        value = value.lower()
+        for member in cls:
+            if member.lower() == value:
+                return member
+        return None
+
+
+class TagSourceTagLabel(CaseInsensitiveEnum):
     CLASSIFICATION = "CLASSIFICATION"
     GLOSSARY = "GLOSSARY"
 
 
-class LabelTypeTagLabel(StrEnum):
+class LabelTypeTagLabel(CaseInsensitiveEnum):
     MANUAL = "MANUAL"
     PROPAGATED = "PROPAGATED"
     AUTOMATED = "AUTOMATED"
     DERIVED = "DERIVED"
 
 
-class StateTagLabel(StrEnum):
+class StateTagLabel(CaseInsensitiveEnum):
     SUGGESTED = "SUGGESTED"
     CONFIRMED = "CONFIRMED"
 
@@ -78,7 +88,7 @@ class OpenMetadataColumn(BaseModel):
 
 
 class DataContract(BaseModel):
-    schema_: List[OpenMetadataColumn] = Field(..., alias="schema")
+    schema_: Optional[List[OpenMetadataColumn]] = Field(None, alias="schema")
 
 
 class DataSharingAgreement(BaseModel):
