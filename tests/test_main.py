@@ -4,7 +4,7 @@ from unittest.mock import Mock
 from fastapi.encoders import jsonable_encoder
 from starlette.testclient import TestClient
 
-from src.dependencies import get_provision_service
+from src.dependencies import get_provision_service, get_update_acl_service
 from src.main import app
 from src.models.api_models import (
     DescriptorKind,
@@ -172,23 +172,58 @@ def test_updateacl_invalid_descriptor():
         refs=["user:alice", "user:bob"],
     )
 
+    def mock_update_acl_service_service():
+        m = Mock()
+        return m
+
+    app.dependency_overrides[get_update_acl_service] = mock_update_acl_service_service
     resp = client.post("/v1/updateacl", json=jsonable_encoder(updateacl_request))
 
+    app.dependency_overrides = {}
     assert resp.status_code == 400
     assert "Unable to parse the descriptor." in resp.json().get("errors")
 
 
-def test_updateacl_valid_descriptor():
-    descriptor_str = Path(
-        "tests/descriptors/descriptor_output_port_valid.yaml"
-    ).read_text()
-
+def test_updateacl_ok():
+    descriptor_str = Path("tests/descriptors/descriptor_valid.yaml").read_text()
     updateacl_request = UpdateAclRequest(
         provisionInfo=ProvisionInfo(request=descriptor_str, result=""),
         refs=["user:alice", "user:bob"],
     )
 
+    def mock_update_acl_service_service():
+        m = Mock()
+        m.update_acls.return_value = ProvisioningStatus(
+            status=Status1.COMPLETED, result=""
+        )
+        return m
+
+    app.dependency_overrides[get_update_acl_service] = mock_update_acl_service_service
+
     resp = client.post("/v1/updateacl", json=jsonable_encoder(updateacl_request))
 
+    app.dependency_overrides = {}
+    assert resp.status_code == 200
+    assert resp.json() == {"info": None, "result": "", "status": "COMPLETED"}
+
+
+def test_updateacl_ko():
+    descriptor_str = Path("tests/descriptors/descriptor_valid.yaml").read_text()
+    updateacl_request = UpdateAclRequest(
+        provisionInfo=ProvisionInfo(request=descriptor_str, result=""),
+        refs=["user:alice", "user:bob"],
+    )
+    error_msg = "unexpected error"
+
+    def mock_update_acl_service_service():
+        m = Mock()
+        m.update_acls.return_value = SystemErr(error=error_msg)
+        return m
+
+    app.dependency_overrides[get_update_acl_service] = mock_update_acl_service_service
+
+    resp = client.post("/v1/updateacl", json=jsonable_encoder(updateacl_request))
+
+    app.dependency_overrides = {}
     assert resp.status_code == 500
-    assert "Response not yet implemented" in resp.json().get("error")
+    assert resp.json() == {"error": error_msg}

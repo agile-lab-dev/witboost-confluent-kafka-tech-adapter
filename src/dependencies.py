@@ -19,6 +19,7 @@ from src.services.sasl_plain_principal_mapping_service import (
     SaslPlainPrincipalMappingService,
 )
 from src.services.schema_registry_service import SchemaRegistryService
+from src.services.update_acl_service import UpdateAclService
 from src.settings.kafka_settings import KafkaSettings
 from src.utility.logger import get_logger
 from src.utility.parsing_pydantic_models import parse_yaml_with_model
@@ -237,3 +238,18 @@ def get_provision_service(
 
 
 ProvisionServiceDep = Annotated[ProvisionService, Depends(get_provision_service)]
+
+
+def get_update_acl_service(
+    principal_mapping_service: Annotated[
+        PrincipalMappingService, Depends(get_principal_mapping_service)
+    ],
+    acl_service: Annotated[AclService, Depends(get_acl_service)],
+) -> UpdateAclService:
+    return UpdateAclService(principal_mapping_service, acl_service)
+
+
+UpdateAclServiceDep = Annotated[
+    UpdateAclService,
+    Depends(get_update_acl_service),
+]
